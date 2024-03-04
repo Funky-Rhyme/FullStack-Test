@@ -1,0 +1,78 @@
+@WebApi_HostAddress = https://localhost:7191
+
+POST {{WebApi_HostAddress}}/entityprocessing
+Content-Type: application/json
+
+[
+    {
+        "code":1,
+        "value":"value1"
+    },
+    {
+        "code":5,
+        "value":"value2"
+    },
+    {
+        "code":10,
+        "value":"value32"
+    },
+    {
+        "code":11,
+        "value":"value11"
+    },
+    {
+        "code":51,
+        "value":"value21"
+    },
+    {
+        "code":101,
+        "value":"value321"
+    },
+    {
+        "code":12,
+        "value":"value12"
+    },
+    {
+        "code":52,
+        "value":"value22"
+    },
+    {
+        "code":102,
+        "value":"value322"
+    },
+    {
+        "code":13,
+        "value":"value13"
+    },
+    {
+        "code":53,
+        "value":"value23"
+    },
+    {
+        "code":103,
+        "value":"value323"
+    },
+    {
+        "code":14,
+        "value":"value14"
+    },
+    {
+        "code":54,
+        "value":"value24"
+    },
+    {
+        "code":104,
+        "value":"value324"
+    }
+
+]
+
+###
+
+
+GET {{WebApi_HostAddress}}/entityprocessing?pageNumber=2&pageSize=2
+
+
+###
+
+GET {{WebApi_HostAddress}}/entityprocessing

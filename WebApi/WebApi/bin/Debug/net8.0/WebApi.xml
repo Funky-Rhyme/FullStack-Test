@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WebApi</name>
+    </assembly>
+    <members>
+        <member name="M:WebApi.Controllers.EntityProcessingController.PostAsync(System.Collections.Generic.IEnumerable{WebApi.Models.DbEntity})">
+            <summary>
+            Posts array of entities
+            </summary>
+            <param name="json"></param>
+            <remarks>
+            ## Example: 
+            
+                POST /PostEntityArray
+                {
+                    "Code": 1123,
+                    "Value": "asdasdasd1123"
+                }
+            
+            </remarks>
+        </member>
+        <member name="M:WebApi.Controllers.EntityProcessingController.GetAsync(WebApi.Models.EntityParameters)">
+            <summary>
+            Returns a JSON array of all entities
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
