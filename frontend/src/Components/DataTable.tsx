@@ -1,9 +1,5 @@
 import { useState, useEffect } from "react";
-
-type Data = {
-  Code: number;
-  Value: string;
-};
+import { Data } from "../types/Data";
 
 type PaginationInfo = {
   TotalCount: number;

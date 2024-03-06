@@ -1,9 +1,5 @@
 import { memo, useEffect, useState } from "react";
-
-type Data = {
-  Code: number;
-  Value: string;
-};
+import { Data } from "../types/Data";
 
 type DataItemProps = {
   myKey: number;

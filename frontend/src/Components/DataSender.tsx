@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import DataItem from "./DataItem";
-
-type Data = {
-  Code: number;
-  Value: string;
-};
+import { Data } from "../types/Data";
 
 function DataSender() {
   const [count, setCount] = useState(1);
