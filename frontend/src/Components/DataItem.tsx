@@ -1,40 +1,41 @@
-import { memo, useEffect, useState } from "react";
+import { ChangeEvent } from "react";
 import { Data } from "../types/Data";
 
 type DataItemProps = {
-  myKey: number;
-  setData: (childData: Data) => void;
-  collectData: boolean;
+  setData: (childData: Partial<Data>, index: number) => void;
+  deleteItem: (index: number) => void;
+  index: number;
+  currentItem: Data;
 };
 
-const DataItem = memo((props: DataItemProps) => {
-  const [code, setCode] = useState(0);
-  const [value, setValue] = useState("abc123");
-
-  const handleCodeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCode(Number(e.target.value));
-  };
-
-  const handleValueInput = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setValue(e.target.value);
-
-  useEffect(() => {
-    if (props.collectData) {
-      props.setData({ Code: code, Value: value });
+const DataItem = ({
+  setData,
+  deleteItem,
+  index,
+  currentItem,
+}: DataItemProps) => {
+  function handleCodeData(event: ChangeEvent<HTMLInputElement>) {
+    const inputValue = event.target.value;
+    if (parseInt(inputValue) >= 0) {
+      setData({ code: Number(inputValue) }, index);
+    } else {
+      setData({ code: 0 }, index);
     }
-  }, [props, code, value]);
+  }
+
+  function handleDelete() {
+    deleteItem(index);
+  }
 
   return (
-    <div
-      className="row d-flex justify-content-center pt-4 g-3"
-      key={props.myKey}
-    >
+    <div className="row d-flex justify-content-center pt-4 g-3">
       <div className="col-3">
         <input
-          type="text"
+          type="number"
           className="form-control"
           placeholder="Code"
-          onChange={handleCodeInput}
+          onChange={handleCodeData}
+          value={currentItem.code || ""}
         />
       </div>
       <div className="col-3">
@@ -42,11 +43,20 @@ const DataItem = memo((props: DataItemProps) => {
           type="text"
           className="form-control"
           placeholder="Value"
-          onChange={handleValueInput}
+          onChange={(e) => setData({ value: e.target.value }, index)}
+          value={currentItem.value || ""}
+        />
+      </div>
+      <div className="col-1">
+        <input
+          type="button"
+          className="btn btn-danger"
+          value="X"
+          onClick={handleDelete}
         />
       </div>
     </div>
   );
-});
+};
 
 export default DataItem;

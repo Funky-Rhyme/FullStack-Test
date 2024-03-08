@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { Data } from "../types/Data";
 
 type PaginationInfo = {
@@ -10,9 +10,24 @@ type PaginationInfo = {
   HasPrevious: boolean;
 };
 
-enum pageChange {
+type State = {
+  count: number;
+};
+
+enum Action {
   Increment,
   Dicrement,
+}
+
+function reducer(state: State, action: Action) {
+  switch (action) {
+    case Action.Increment: {
+      return { ...state, count: state.count + 1 };
+    }
+    case Action.Dicrement: {
+      return { ...state, count: state.count - 1 };
+    }
+  }
 }
 
 function DataTable() {
@@ -28,21 +43,16 @@ function DataTable() {
   });
 
   const pageSize = 10;
-  const [pageNumber, setPageNumber] = useState(1);
 
-  function handlePageChange(change: pageChange) {
-    if (change === pageChange.Increment) {
-      setPageNumber(pageNumber + 1);
-    } else if (change === pageChange.Dicrement) {
-      setPageNumber(pageNumber - 1);
-    }
-  }
+  const [state, dispatch] = useReducer(reducer, {
+    count: 1,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://localhost:7191/entityprocessing?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+          `https://localhost:7191/entityprocessing?pageNumber=${state.count}&pageSize=${pageSize}`,
           {
             method: "GET",
           }
@@ -72,13 +82,13 @@ function DataTable() {
       }
     };
     fetchData();
-  }, [pageNumber]);
+  }, [state.count]);
 
   return (
     <div className="container px-5">
       {loading ? (
         <div className="spinnner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span>Loading...</span>
         </div>
       ) : (
         <table className="table">
@@ -91,21 +101,18 @@ function DataTable() {
           </thead>
           <tbody>
             {data.map((item, index) => (
-              <tr key={index + (pageNumber - 1) * pageSize}>
-                <td>{index + 1 + (pageNumber - 1) * pageSize}</td>
-                <td>{item.Code}</td>
-                <td>{item.Value}</td>
+              <tr key={index + (state.count - 1) * pageSize}>
+                <td>{index + 1 + (state.count - 1) * pageSize}</td>
+                <td>{item.code}</td>
+                <td>{item.value}</td>
               </tr>
             ))}
           </tbody>
           <nav>
             <ul className="pagination">
               <li className="page-item">
-                {pageNumber !== 1 ? (
-                  <a
-                    href="#"
-                    onClick={() => handlePageChange(pageChange.Dicrement)}
-                  >
+                {state.count !== 1 ? (
+                  <a href="#" onClick={() => dispatch(Action.Dicrement)}>
                     Previous
                   </a>
                 ) : (
@@ -116,11 +123,8 @@ function DataTable() {
               </li>
 
               <li className="page-item">
-                {pageNumber !== paginationInfo.TotalPages ? (
-                  <a
-                    href="#"
-                    onClick={() => handlePageChange(pageChange.Increment)}
-                  >
+                {state.count !== paginationInfo.TotalPages ? (
+                  <a href="#" onClick={() => dispatch(Action.Increment)}>
                     Next
                   </a>
                 ) : (

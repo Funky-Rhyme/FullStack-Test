@@ -1,5 +1,5 @@
 export type Data = {
-    Code: number;
-    Value: string;
+    code: number | null;
+    value: string | null;
 };
   

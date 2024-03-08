@@ -1,84 +1,97 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import DataItem from "./DataItem";
 import { Data } from "../types/Data";
 
-function DataSender() {
-  const [count, setCount] = useState(1);
-  const [dataTransfer, setDataTransfer] = useState(false);
-  const [collectedData, setCollectedData] = useState<Data[]>([]);
+const processing = async (data: Data[], onError?: () => void) => {
+  const filteredData = data.filter((i) => i.code != null || i.value !== null);
 
-  useEffect(() => {
-    if (dataTransfer === true && collectedData.length > 0) {
-      fetch("https://localhost:7191/entityprocessing", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(collectedData),
-      });
-    }
-  }, [collectedData, dataTransfer]);
+  if (filteredData.length !== data.length) {
+    alert("Неверный данные!");
+    onError?.();
+  } else {
+    await fetch("https://localhost:7191/entityprocessing", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(
+        filteredData
+          .map((i) => ({ [(i.code || "")?.toString()]: i.value }))
+          .toString()
+      ),
+    });
+  }
+};
+
+function DataSender() {
+  const defaultItem = { code: null, value: null };
+  const [collectedData, setCollectedData] = useState<Data[]>([defaultItem]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const createNewComponent = () => {
-    setCount(count + 1);
+    collectedData.push({ ...defaultItem });
+    setCollectedData([...collectedData]);
   };
 
   const handleInputData = useCallback(
-    (childData: Data) => {
-      setCollectedData((prevData) => [...prevData, childData]);
-      console.log(collectedData);
+    (childData: Partial<Data>, index: number) => {
+      collectedData[index] = { ...collectedData[index], ...childData };
+      setCollectedData([...collectedData]);
     },
-    [collectedData]
+    []
   );
 
-  const handleDataCollect = () => {
-    setDataTransfer(true);
-  };
-
-  useEffect(() => {
-    if (collectedData.length) {
-      setDataTransfer(false);
-      setCollectedData([]);
-    }
-  }, [collectedData, dataTransfer]);
-
-  const components = [];
-  for (let i: number = 0; i < count; i++) {
-    components.push(
-      <DataItem
-        myKey={i}
-        setData={handleInputData}
-        collectData={dataTransfer}
-      />
-    );
-  }
-
   return (
-    <div className="container-fluid">
-      <form>
-        {components}
-        <div className="row justify-content-center pt-3">
-          <div className="col-3">
-            <button
-              type="button"
-              onClick={createNewComponent}
-              className="btn btn-primary"
-            >
-              Добавить
-            </button>
+    <>
+      <div className="container-fluid">
+        <form>
+          {[...Array(collectedData.length).keys()].map((_, i) => {
+            return (
+              <DataItem
+                setData={handleInputData}
+                index={i}
+                key={i}
+                currentItem={collectedData[i]}
+                deleteItem={(index) => {
+                  collectedData.splice(index, 1);
+                  setCollectedData([...collectedData]);
+                }}
+              />
+            );
+          })}
+          <div className="row justify-content-center pt-3">
+            <div className="col-3">
+              <button
+                type="button"
+                onClick={createNewComponent}
+                className="btn btn-primary"
+              >
+                Добавить
+              </button>
+            </div>
+            <div className="col-3">
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={async () => {
+                  setIsLoading(true);
+                  try {
+                    await processing(collectedData);
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+              >
+                Отправить
+              </button>
+            </div>
           </div>
-          <div className="col-3">
-            <button
-              type="button"
-              className="btn btn-danger"
-              onClick={handleDataCollect}
-            >
-              Отправить
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+      <div className="container-fluid justify-content-center">
+        {isLoading && <div className="spinner-border" role="statis"></div>}
+      </div>
+    </>
   );
 }
 
