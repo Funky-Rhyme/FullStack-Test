@@ -3,6 +3,7 @@ using WebApi.Extrenstions;
 using WebApi.MiddleWare;
 using WebApi.Models;
 using System.Text.Json;
+using WebApi.Extenstions;
 
 namespace WebApi.Controllers
 {
@@ -27,24 +28,28 @@ namespace WebApi.Controllers
         /// ## Example: 
         /// 
         ///     POST /PostEntityArray
-        ///     {
-        ///         "Code": 1123,
-        ///         "Value": "asdasdasd1123"
-        ///     }
-        /// 
+        ///     [
+        ///         {"1": "value1"},
+        ///         {"5": "value2}"
+        ///     ]
+        ///     
         /// </remarks>
         [HttpPost(Name = "PostEntityArray")]
-        public async Task<IActionResult> PostAsync([FromBody] IEnumerable<DbEntity> json)
+        public async Task<IActionResult> PostAsync([FromBody] List<Dictionary<string, string>> json)
         {
             if (json == null) 
             {
                 return BadRequest("Zero entities passed");
             }
 
-            await _context.Database.EnsureDeletedAsync();
+            var allEntities = _context.dbEntities.ToList(); 
+
+            _context.dbEntities.RemoveRange(allEntities);
             await _context.Database.EnsureCreatedAsync();
 
-            var entities = json.OrderBy(j => j.Code);
+            
+
+            var entities = DataConverter.ConvertToEntity(json).OrderBy(j => j.Code);
 
             await _context.dbEntities.AddRangeAsync(entities);
             await _context.SaveChangesAsync();
@@ -57,7 +62,7 @@ namespace WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet(Name = "GetEntities")]
-        public async Task<JsonResult> GetAsync([FromQuery]EntityParameters parameters)
+        public async Task<IActionResult> GetAsync([FromQuery]EntityParameters parameters)
         {
             await _context.Database.EnsureCreatedAsync();
             PagedList<DbEntity> result = PagedList<DbEntity>.ToPagedList(_context
@@ -75,7 +80,7 @@ namespace WebApi.Controllers
 
             Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(meta));
 
-            return new JsonResult(result);
+            return Ok(result);
         }
 
     }

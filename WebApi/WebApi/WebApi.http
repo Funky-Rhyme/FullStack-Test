@@ -76,3 +76,17 @@ GET {{WebApi_HostAddress}}/entityprocessing?pageNumber=2&pageSize=2
 ###
 
 GET {{WebApi_HostAddress}}/entityprocessing
+
+###
+
+POST {{WebApi_HostAddress}}/entityprocessing
+Content-Type: application/json
+
+[
+    { "1": "value1" },
+    { "5": "value2" },
+    { "10": "value32" },
+    { "11": "value11" }
+]
+
+###
