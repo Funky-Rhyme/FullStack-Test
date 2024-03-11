@@ -1,3 +1,5 @@
+-- Задание 1
+
 USE [SQLTest]
 
 GO
@@ -47,6 +49,8 @@ HAVING
 	COUNT(cc.Id) > 2
 	
 	
+	
+-- Задание 2
 	
 
 USE [Test]
