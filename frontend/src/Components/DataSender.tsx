@@ -15,9 +15,7 @@ const processing = async (data: Data[], onError?: () => void) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(
-        filteredData
-          .map((i) => ({ [(i.code || "")?.toString()]: i.value }))
-          .toString()
+        filteredData.map((i) => ({ [(i.code || "")?.toString()]: i.value }))
       ),
     });
   }
